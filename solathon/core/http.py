@@ -5,7 +5,7 @@ import asyncio
 import base64
 import httpx
 from typing import Any, List, Dict
-
+import platform
 
 from .. import __version__
 from ..publickey import PublicKey
@@ -58,18 +58,19 @@ class AsyncHTTPClient:
     """Asynchronous HTTP Client to interact with Solana JSON RPC"""
 
     def __init__(self, endpoint: str):
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-        self.endpoint = endpoint
-        version = sys.version_info
-        self.headers = {
-            "Content-Type": "application/json",
-            "User-Agent": (
-                "Solathon (https://github.com/GitBolt/solathon "
-                f"{__version__}) Python{version[0]} {version[1]}"
-            ),
-        }
-        self.request_id = 0
-        self.client = httpx.AsyncClient()
+        if platform.system() == 'Windows':
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+            self.endpoint = endpoint
+            version = sys.version_info
+            self.headers = {
+                "Content-Type": "application/json",
+                "User-Agent": (
+                    "Solathon (https://github.com/GitBolt/solathon "
+                    f"{__version__}) Python{version[0]} {version[1]}"
+                ),
+            }
+            self.request_id = 0
+            self.client = httpx.AsyncClient()
         
 
     async def send(self, data: Dict[str, Any]) -> RPCResponse:
